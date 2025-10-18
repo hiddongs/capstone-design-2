@@ -29,12 +29,16 @@ public class AuthApiController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<Void> signup(@RequestBody @Valid AuthDto.SignupDto signupDto) {
+    public ResponseEntity<?> signup(@RequestBody @Valid AuthDto.SignupDto signupDto) {
+    	try {
         String encodedPassword = encoder.encode(signupDto.getPassword()); // 비밀번호 암호화
         AuthDto.SignupDto newSignupDto = AuthDto.SignupDto.encodePassword(signupDto, encodedPassword);
 
         userService.registerUser(newSignupDto);
         return new ResponseEntity<>(HttpStatus.OK);
+    	}catch(IllegalArgumentException e){
+    		return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    	}
     }
 
     // 로그인 -> 토큰 발급

@@ -1,9 +1,14 @@
 package com.medical_web_service.capstone.dto;
 
-import lombok.*;
-
 import java.util.Date;
-import java.util.List;
+
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 public class AuthDto {
 
@@ -27,7 +32,9 @@ public class AuthDto {
         private String password;
         private String name;
         private String phone;
-        private String age;
+        @Temporal(TemporalType.DATE)
+        private Date birthDate;
+
         private String gender;
 
 
@@ -43,7 +50,7 @@ public class AuthDto {
             newSignupDto.password = encodedPassword;
             newSignupDto.name = signupDto.getName();
             newSignupDto.phone = signupDto.getPhone();
-            newSignupDto.age = signupDto.getAge();
+            newSignupDto.birthDate = signupDto.getBirthDate();
             newSignupDto.gender = signupDto.getGender();
 
             return newSignupDto;

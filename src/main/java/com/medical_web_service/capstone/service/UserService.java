@@ -32,8 +32,19 @@ public class UserService {
 
     @Transactional
     public void registerUser(AuthDto.SignupDto signupDto) {
+        
+        if (userRepository.existsByUsername(signupDto.getUsername())) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        }
+
+        //  전화번호 중복 체크
+        if (userRepository.existsByPhone(signupDto.getPhone())) {
+            throw new IllegalArgumentException("이미 등록된 전화번호입니다.");
+        }
+
         User user = User.registerUser(signupDto);
         userRepository.save(user);
+       
     }
 
     @Transactional
@@ -41,6 +52,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         // 아이디 중복 확인
+       
         if (!user.getUsername().equals(updateDto.getUsername()) && isUsernameTaken(updateDto.getUsername())) {
             throw new IllegalArgumentException("Username already taken");
         }

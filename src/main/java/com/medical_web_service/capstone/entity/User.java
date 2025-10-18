@@ -31,16 +31,17 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String username; // Principal
-
+    @Column(nullable = false)
     private String password; // Credential
 
     private String name;
 
-    private String age;
+    private Date birthDate;
 
     private String gender;
-
+    @Column(nullable = false, unique = true)
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -67,7 +68,7 @@ public class User {
         user.username = signupDto.getUsername();
         user.password = signupDto.getPassword();
         user.name = signupDto.getName();
-        user.age = signupDto.getAge();
+        user.birthDate = signupDto.getBirthDate();
         user.gender = signupDto.getGender();
         user.phone = signupDto.getPhone();
         user.role = Role.USER;
