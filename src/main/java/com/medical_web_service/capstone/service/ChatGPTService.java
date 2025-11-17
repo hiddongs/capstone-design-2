@@ -1,12 +1,14 @@
 package com.medical_web_service.capstone.service;
 
 
-import com.medical_web_service.capstone.dto.ChatCompletionDto;
-import com.medical_web_service.capstone.dto.CompletionDto;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import com.medical_web_service.capstone.dto.ChatCompletionDto;
+import com.medical_web_service.capstone.dto.CompletionDto;
 
 /**
  * ChatGPT 서비스 인터페이스
@@ -15,7 +17,7 @@ import java.util.Map;
  * @fileName : ChatGPTService
  * @since : 12/29/23
  */
-
+@Profile("!export-schema")
 @Service
 public interface ChatGPTService {
 

@@ -1,10 +1,25 @@
 package com.medical_web_service.capstone.service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.medical_web_service.capstone.config.ChatGPTConfig;
 import com.medical_web_service.capstone.dto.ChatCompletionDto;
 import com.medical_web_service.capstone.dto.ChatRequestMsgDto;
@@ -12,20 +27,8 @@ import com.medical_web_service.capstone.dto.CompletionDto;
 import com.medical_web_service.capstone.entity.DiseaseHistory;
 import com.medical_web_service.capstone.entity.User;
 import com.medical_web_service.capstone.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ChatGPT Service 구현체
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
  * @fileName : ChatGPTServiceImpl
  * @since : 12/29/23
  */
+@Profile("!export-schema")
 @Slf4j
 @Service
 public class ChatGPTServiceImpl implements ChatGPTService {
@@ -283,8 +287,8 @@ public class ChatGPTServiceImpl implements ChatGPTService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // User 객체에서 생년월일을 가져와 나이 계산
-        String birthDateString = user.getAge(); // YYYY-MM-DD 형식
-        LocalDate birthDate = LocalDate.parse(birthDateString);
+        Date birthDateString = user.getBirthDate(); // YYYY-MM-DD 형식
+        LocalDate birthDate = LocalDate.parse((CharSequence) birthDateString);
         int age = Period.between(birthDate, LocalDate.now()).getYears();
 
         String gender = user.getGender();

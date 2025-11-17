@@ -27,7 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-
+    	
+    	// 🔥 Diagnosis API는 JWT 인증 건너뛰기
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/api/v1/diagnosis")) {
+        	log.info("⛔ JWT Filter skipped for Diagnosis API: {}", uri);
+            filterChain.doFilter(request, response);
+            return;
+        }
         // Access Token 추출
         String accessToken = resolveToken(request);
 
