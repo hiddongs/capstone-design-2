@@ -4,62 +4,66 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.medical_web_service.capstone.dto.AuthDto;
-import com.medical_web_service.capstone.entity.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
-
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class User {
 
-    @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username; // Principal
+    private String username;    // Principal
+
     @Column(nullable = false)
-    private String password; // Credential
+    private String password;    // Credential
 
     private String name;
-
     private Date birthDate;
-
     private String gender;
+
     @Column(nullable = false, unique = true)
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    private Role role; // 사용자 권한
+    private Role role;
 
+    // 게시판 목록
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Board> boards = new ArrayList<>();
+    private Set<Board> boards = new HashSet<>();
 
+    // 유저 질병 이력
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<DiseaseHistory> diseaseHistory;
+    private Set<DiseaseHistory> diseaseHistory = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<SearchingDiseaseHistory> searchingDiseaseHistories;
+    // GPT 검색 이력
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<SearchingDiseaseHistory> searchingDiseaseHistories = new HashSet<>();
 
+    // 이미지
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images = new ArrayList<>();
+    @JsonIgnore
+    private Set<Image> images = new HashSet<>();
+
+    private String department; // 진료과 (internal / ent / pediatrics ...)
 
     // == 생성 메서드 == //
     public static User registerUser(AuthDto.SignupDto signupDto) {
@@ -76,8 +80,9 @@ public class User {
         return user;
     }
 
+    // 게시글 연결
     public void addBoard(Board board) {
         this.boards.add(board);
-        board.setUser(this); // 보드의 사용자 정보를 설정합니다.
+        board.setUser(this);
     }
 }

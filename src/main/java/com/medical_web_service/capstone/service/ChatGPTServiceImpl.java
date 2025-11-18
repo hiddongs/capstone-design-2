@@ -2,6 +2,7 @@ package com.medical_web_service.capstone.service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -210,7 +211,14 @@ public class ChatGPTServiceImpl implements ChatGPTService {
         // 시스템 메시지: GPT에게 역할을 설명
         ChatRequestMsgDto systemMessage = new ChatRequestMsgDto();
         systemMessage.setRole("system");
-        systemMessage.setContent("당신은 경험이 풍부한 의사입니다. 사용자의 증상에 대해 정확하고 신뢰할 수 있는 정보를 제공해야 합니다. 가능한 질병과 함께 예방 방법, 치료 방법도 제공해야 합니다. 증상이 심각할 경우 병원에 가야 한다고 유도해 주세요.");
+        systemMessage.setContent(
+        	    "당신은 경험이 풍부한 의사입니다. " +
+        	    	    "사용자의 증상을 분석해 가능한 질병을 제시하고, " +
+        	    	    "예방 방법과 치료 방법을 제공합니다. " +
+        	    	    "또한 사용자가 약국에서 구입 가능한 일반의약품(상비약)도 자세하게 함께 추천해야 합니다. " +
+        	    	    "단, 전문의약품은 절대 추천하지 마세요. " +
+        	    	    "위험 증상이 있을 경우 병원에 방문하도록 명확히 안내하세요."
+        	    	);
 
         // 사용자 메시지: 실제 증상 입력
         ChatRequestMsgDto userMessage = new ChatRequestMsgDto();
@@ -294,7 +302,9 @@ public class ChatGPTServiceImpl implements ChatGPTService {
         String gender = user.getGender();
 
         // User 객체에서 질병 이력을 가져옵니다.
-        List<DiseaseHistory> diseaseHistories = user.getDiseaseHistory();
+        List<DiseaseHistory> diseaseHistories = new ArrayList<>(user.getDiseaseHistory());
+
+
         String medicalHistory;
 
         if (diseaseHistories == null || diseaseHistories.isEmpty()) {

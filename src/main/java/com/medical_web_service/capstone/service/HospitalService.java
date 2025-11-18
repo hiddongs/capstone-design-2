@@ -38,6 +38,19 @@ public class HospitalService {
 
     private final HospitalRepository hospitalRepository;
 
+    
+ // EPSG5174 → WGS84 변환 함수
+    private double[] convert5174ToWGS84(double x, double y) {
+        // 중부원점 TM → WGS84
+        double dx = x - 200000;
+        double dy = y - 500000;
+
+        double lat = dy * 0.000008983 + 38.0;
+        double lng = dx * 0.000010966 + 127.0;
+
+        return new double[]{lat, lng};
+    }
+
     @PostConstruct
     public void loadCsv() {
         var resource = new ClassPathResource(HOSPITAL_CSV_PATH);
@@ -59,23 +72,34 @@ public class HospitalService {
 
             while ((col = reader.readNext()) != null) {
                 try {
+
+                    // X/Y 좌표 변환 (EPSG5174 → WGS84)
+                    Double x5174 = parseDoubleSafe(col[26]);
+                    Double y5174 = parseDoubleSafe(col[27]);
+
+                    Double realX = null;
+                    Double realY = null;
+
+                    if (x5174 != null && y5174 != null) {
+                        double[] wgs = convert5174ToWGS84(x5174, y5174);
+                        realY = wgs[0]; // 위도
+                        realX = wgs[1]; // 경도
+                    }
+
                     Hospital hospital = Hospital.builder()
-                        .businessName(clean(col[21]))     // 사업장명
-                        .address(clean(col[18]))          // 주소
-                        .phone(clean(col[15]))            // 전화번호
-                        .department(clean(col[34]))       // 진료과목내용명
-                        .type(clean(col[28]))             // 의료기관종별명
-                        .status(clean(col[8]))            // 영업상태명
-                        .x(parseDoubleSafe(col[26]))      // X좌표
-                        .y(parseDoubleSafe(col[27]))      // Y좌표
+                        .businessName(clean(col[21]))      // 사업장명
+                        .address(clean(col[18]))           // 주소
+                        .phone(clean(col[15]))             // 전화번호
+                        .department(clean(col[34]))        // 진료과목내용명
+                        .type(clean(col[28]))              // 의료기관종별명
+                        .status(clean(col[8]))             // 영업상태명
+                        .x(realX)                          // 변환된 경도
+                        .y(realY)                          // 변환된 위도
                         .build();
-                    // 🐛 한글 데이터 확인 로그
-                    log.info("📌 병원명: {}", hospital.getBusinessName());
-                    log.info("🏠 주소: {}", hospital.getAddress());
-                    log.info("🩺 과목: {}", hospital.getDepartment());
+
                     hospitalRepository.save(hospital);
                     success++;
-                    
+
                 } catch (Exception e) {
                     fail++;
                     log.warn("⚠️ 병원 파싱 실패: {}", e.getMessage());
@@ -88,6 +112,7 @@ public class HospitalService {
 
         log.info("✅ 병원 CSV 로딩 완료 - 성공: {}건 / 실패: {}건", success, fail);
     }
+
 
     public List<Hospital> searchByKeyword(String keyword) {
         return hospitalRepository.findByBusinessNameContaining(keyword);
@@ -226,6 +251,8 @@ public class HospitalService {
             return resultList;
         }
     }
-
+    public List<Hospital> getAllHospitals() {
+        return hospitalRepository.findAll();
+    }
 
 }

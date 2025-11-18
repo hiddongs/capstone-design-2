@@ -17,6 +17,9 @@ import com.medical_web_service.capstone.config.jwt.JwtAuthenticationFilter;
 import com.medical_web_service.capstone.config.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +40,8 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.and())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(h -> h.disable())
                 .formLogin(f -> f.disable());
@@ -62,7 +66,8 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "/api-docs/**"
+                        "/api-docs/**",
+                        "/api/triage/**"
                 ).permitAll()
 
                 // 로그인/회원가입
@@ -86,4 +91,18 @@ public class SecurityConfig {
     ) throws Exception {
         return configuration.getAuthenticationManager();
     }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOriginPattern("*"); // 모든 프론트엔드 허용
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
 }

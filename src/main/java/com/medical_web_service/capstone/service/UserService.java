@@ -70,6 +70,10 @@ public class UserService {
         user.setPhone(newPhone);
         userRepository.save(user);
     }
+    @Transactional(readOnly = true)
+    public User getUserWithHistories(Long userId) {
+        return userRepository.findUserWithHistories(userId);
+    }
 
     @Transactional
     public void deleteUser(Long userId) {

@@ -29,6 +29,7 @@ public class TriageForm {
     // AI가 생성한 요약
     @Column(columnDefinition = "TEXT")
     private String aiSummary;
+    private Long doctorId;
 
     private LocalDateTime createdAt;
 }

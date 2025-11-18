@@ -14,7 +14,8 @@ public class NaverApiController {
 
         HttpHeaders headers = new HttpHeaders();
       
-      
+        headers.set("X-Naver-Client-Id", "27pxj9zl1c");
+        headers.set("X-Naver-Client-Secret", "qTCCJkZCUYNoZsFt8QqY7MgUQvGdOMbcxzskkOqm");
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.medical_web_service.capstone.entity.Hospital;
+import com.medical_web_service.capstone.repository.HospitalRepository;
 import com.medical_web_service.capstone.service.HospitalService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class HospitalController {
 
     private final HospitalService hospitalService;
+    private final HospitalRepository hospitalRepository;
 
     @GetMapping("/search")
     public List<Hospital> searchByKeyword(@RequestParam String query) {
@@ -35,5 +37,20 @@ public class HospitalController {
             @RequestParam double lng
     ) {
         return hospitalService.searchNearby(lat, lng);
+    }
+    
+    @GetMapping("/all")
+    public List<Hospital> getAllHospitals() {
+        return hospitalService.getAllHospitals();
+    }
+
+    @GetMapping("/viewport")
+    public List<Hospital> getHospitalsInViewport(
+            @RequestParam double minLat,
+            @RequestParam double maxLat,
+            @RequestParam double minLng,
+            @RequestParam double maxLng
+    ) {
+        return hospitalRepository.findByYBetweenAndXBetween(minLat, maxLat, minLng, maxLng);
     }
 }

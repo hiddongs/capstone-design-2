@@ -42,5 +42,14 @@ public class TriageService {
         return triageRepository.findAll();
     }
 
+    public TriageForm assignDoctor(Long triageId, Long doctorId) {
+        TriageForm form = triageRepository.findById(triageId)
+                .orElseThrow(() -> new RuntimeException("문진 정보 없음"));
+
+        form.setDoctorId(doctorId);
+
+        return triageRepository.save(form);
+    }
+
 }
 

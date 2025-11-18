@@ -1,15 +1,18 @@
 package com.medical_web_service.capstone.service;
 
-import com.medical_web_service.capstone.dto.DiseaseHistoryDto;
-import com.medical_web_service.capstone.entity.DiseaseHistory;
-import com.medical_web_service.capstone.entity.User;
-import com.medical_web_service.capstone.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.medical_web_service.capstone.entity.Role;
+import com.medical_web_service.capstone.entity.User;
+import com.medical_web_service.capstone.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -36,4 +39,7 @@ public class DoctorService {
         return result;
     }
 
+    public List<User> getDoctorsByDepartment(String department) {
+        return userRepository.findByRoleAndDepartment(Role.DOCTOR, department);
+    }
 }

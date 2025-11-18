@@ -9,5 +9,8 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
 
     List<Hospital> findByBusinessNameContaining(String keyword);
     List<Hospital> findByDepartmentContaining(String dept);
-
+    List<Hospital> findByYBetweenAndXBetween(
+            double minLat, double maxLat,
+            double minLng, double maxLng
+    );
 }

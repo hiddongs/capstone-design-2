@@ -1,15 +1,18 @@
 package com.medical_web_service.capstone.controller;
 
-import com.medical_web_service.capstone.entity.User;
-import com.medical_web_service.capstone.repository.UserRepository;
-import com.medical_web_service.capstone.service.DoctorService;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.medical_web_service.capstone.entity.User;
+import com.medical_web_service.capstone.service.DoctorService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/doctor")
@@ -26,4 +29,12 @@ public class DoctorController {
         // HTTP 응답 반환
         return ResponseEntity.ok(userDisease);
     }
+    
+    
+    @GetMapping("/list/{department}")
+    public ResponseEntity<List<User>> getDoctors(@PathVariable String department) {
+        List<User> doctors = doctorService.getDoctorsByDepartment(department);
+        return ResponseEntity.ok(doctors);
+    }
+
 }

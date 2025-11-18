@@ -79,11 +79,8 @@ public class UserDiseaseHistoryService {
 
     // 엔티티를 DTO로 변환
     private DiseaseHistoryDto convertToDTO(DiseaseHistory diseaseHistory) {
-        return new DiseaseHistoryDto(
-                diseaseHistory.getDiseaseName(),
-                diseaseHistory.getCompleteCureOrNot(),
-                diseaseHistory.getDateOnOnset(),
-                diseaseHistory.getUser().getId()
-        );
+    	return new DiseaseHistoryDto(diseaseHistory);
+
+        
     }
 }
