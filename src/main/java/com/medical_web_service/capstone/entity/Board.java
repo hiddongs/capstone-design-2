@@ -35,7 +35,12 @@ public class Board {
 
     @Column
     private LocalDateTime updatedTime;
-
+    @Column
+    private String symptom;     // 예: "두통, 열"
+    @Column
+    private String department;  // 예: "이비인후과"
+    @Column
+    private boolean anonymous;  // true면 writer 숨김
     @PrePersist
     protected void onCreate() {
         postedTime = LocalDateTime.now();

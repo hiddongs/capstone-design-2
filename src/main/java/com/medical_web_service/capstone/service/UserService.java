@@ -111,15 +111,17 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Long findIdByUsername(String username) {
-        String jpql = "SELECT u.id FROM users u WHERE u.username = :username";
+        String jpql = "SELECT u.id FROM User u WHERE u.username = :username"; 
         TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
         query.setParameter("username", username);
+
         try {
             return query.getSingleResult();
         } catch (NoResultException e) {
             throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + username);
         }
     }
+
     public boolean isUsernameTaken(String username) {
         return userRepository.findByUsername(username).isPresent();
     }

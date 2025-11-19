@@ -5,6 +5,7 @@ package com.medical_web_service.capstone.service;
 import com.medical_web_service.capstone.dto.CommentDto;
 import com.medical_web_service.capstone.entity.Board;
 import com.medical_web_service.capstone.entity.Comment;
+import com.medical_web_service.capstone.entity.Role;
 import com.medical_web_service.capstone.entity.User;
 import com.medical_web_service.capstone.repository.BoardRepository;
 import com.medical_web_service.capstone.repository.CommentRepository;
@@ -42,6 +43,9 @@ public class CommentService {
         comment.setWriter(user.getName());
         comment.setComment(createCommentDto.getComment());
         comment.setCreatedDate(LocalDateTime.now());
+        if (!user.getRole().equals(Role.DOCTOR)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "의사만 답변할 수 있습니다.");
+        }
 
 
         return commentRepository.save(comment);

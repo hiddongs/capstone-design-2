@@ -19,7 +19,9 @@ public class Hospital {
     private String roadAddress;
     private String phone;
 
-    private String department;         // 기존 진료과
+    @Column(columnDefinition = "TEXT")
+    private String department;
+       // 기존 진료과
     private String departmentName;     // 진료과목내용명 (더 상세)
 
     private String type;               // 기존 의료기관종별명

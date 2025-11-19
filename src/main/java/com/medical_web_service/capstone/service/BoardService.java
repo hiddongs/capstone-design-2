@@ -49,9 +49,13 @@ public class BoardService {
         Board board = new Board();
         board.setTitle(boardDto.getTitle());
         board.setContent(boardDto.getContent());
-        board.setPostedTime(LocalDateTime.now());
-        board.setWriter(userService.modifyName(userId));
 
+        board.setSymptom(boardDto.getSymptom());
+        board.setDepartment(boardDto.getDepartment());
+        board.setAnonymous(boardDto.isAnonymous());
+
+        // 익명이면 writer = "익명"
+        board.setWriter(boardDto.isAnonymous() ? "익명" : userService.modifyName(userId));
         // 보드를 사용자에게 추가합니다.
         user.addBoard(board);
 

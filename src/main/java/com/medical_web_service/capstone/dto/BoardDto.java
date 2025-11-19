@@ -12,7 +12,9 @@ public class BoardDto {
     public static class CreateBoardDto{
         private String title;
         private String content;
-
+        private String symptom;      // 추가
+        private String department;   // 추가
+        private boolean anonymous;   // 추가
 
 
     }
@@ -23,6 +25,9 @@ public class BoardDto {
         private String title;
         private String content;
         private String writer;
+        private String symptom;
+        private String department;
+        private boolean anonymous;
 
     }
 
@@ -36,16 +41,34 @@ public class BoardDto {
         private Long userId; // 작성자의 userId 필드 추가
         private LocalDateTime createdDate;
         private LocalDateTime modifiedDate;
+        private String symptom;
+        private String department;
+        private boolean anonymous;
 
-        public PostDetailsDTO(Long id, String title, String content, String writer, Long userId, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+        public PostDetailsDTO(
+                Long id,
+                String title,
+                String content,
+                String writer,
+                Long userId,
+                LocalDateTime createdDate,
+                LocalDateTime modifiedDate,
+                String symptom,
+                String department,
+                boolean anonymous
+        ) {
             this.id = id;
             this.title = title;
             this.content = content;
             this.writer = writer;
-            this.userId = userId; // 생성자에 userId 추가
+            this.userId = userId;
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
+            this.symptom = symptom;
+            this.department = department;
+            this.anonymous = anonymous;
         }
+
 
     }
 }
