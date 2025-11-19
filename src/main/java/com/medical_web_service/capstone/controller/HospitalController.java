@@ -53,4 +53,9 @@ public class HospitalController {
     ) {
         return hospitalRepository.findByYBetweenAndXBetween(minLat, maxLat, minLng, maxLng);
     }
+    @GetMapping("/active")
+    public List<Hospital> getActiveHospitals() {
+        return hospitalRepository.findByStatusAndStatusDetailContaining("영업/정상", "정상");
+    }
+
 }

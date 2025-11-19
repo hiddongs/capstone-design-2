@@ -87,15 +87,27 @@ public class HospitalService {
                     }
 
                     Hospital hospital = Hospital.builder()
-                        .businessName(clean(col[21]))      // 사업장명
-                        .address(clean(col[18]))           // 주소
-                        .phone(clean(col[15]))             // 전화번호
-                        .department(clean(col[34]))        // 진료과목내용명
-                        .type(clean(col[28]))              // 의료기관종별명
-                        .status(clean(col[8]))             // 영업상태명
-                        .x(realX)                          // 변환된 경도
-                        .y(realY)                          // 변환된 위도
-                        .build();
+                            .businessName(clean(col[21]))
+                            .address(clean(col[18]))
+                            .roadAddress(clean(col[19]))
+                            .phone(clean(col[15]))
+
+                            .department(clean(col[34]))       // 기존 사용
+                            .departmentName(clean(col[34]))   // 상세 진료과
+
+                            .type(clean(col[28]))            // 기존
+                            .medicalType(clean(col[28]))     // 상세
+
+                            .doctorCount(parseIntSafe(col[29]))
+                            .roomCount(parseIntSafe(col[30]))
+                            .bedCount(parseIntSafe(col[31]))
+
+                            .status(clean(col[8]))
+                            .statusDetail(clean(col[10]))   // 상세영업상태명 ← 추가!
+                            .x(realX)
+                            .y(realY)
+                            .build();
+
 
                     hospitalRepository.save(hospital);
                     success++;
@@ -113,6 +125,15 @@ public class HospitalService {
         log.info("✅ 병원 CSV 로딩 완료 - 성공: {}건 / 실패: {}건", success, fail);
     }
 
+    private Integer parseIntSafe(String str) {
+        try {
+            if (str == null) return null;
+            str = str.replace("\"", "").trim();
+            return Integer.parseInt(str);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public List<Hospital> searchByKeyword(String keyword) {
         return hospitalRepository.findByBusinessNameContaining(keyword);

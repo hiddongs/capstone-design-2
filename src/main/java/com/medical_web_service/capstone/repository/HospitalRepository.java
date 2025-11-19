@@ -13,4 +13,7 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
             double minLat, double maxLat,
             double minLng, double maxLng
     );
+    List<Hospital> findByStatusAndStatusDetailContaining(String status, String detail);
+
+
 }
