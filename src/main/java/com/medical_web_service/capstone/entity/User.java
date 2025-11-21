@@ -62,6 +62,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<Image> images = new HashSet<>();
+    private Integer career; // 경력 (년수)
 
     private String department; // 진료과 (internal / ent / pediatrics ...)
 
@@ -76,7 +77,7 @@ public class User {
         user.gender = signupDto.getGender();
         user.phone = signupDto.getPhone();
         user.role = Role.USER;
-
+        
         return user;
     }
 

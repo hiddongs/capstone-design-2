@@ -15,4 +15,5 @@ public class HospitalDto {
     private String department;
     private double x;
     private double y;
+    
 }

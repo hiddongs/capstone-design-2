@@ -66,7 +66,7 @@ public class TriageController {
      * GET /api/triage/user/3
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TriageForm>> getUserTriage(@PathVariable Long userId) {
+    public ResponseEntity<List<TriageForm>> getUserTriage(@PathVariable("id") Long userId) {
         List<TriageForm> list = triageService.getUserForms(userId);
         return ResponseEntity.ok(list);
     }
@@ -90,4 +90,23 @@ public class TriageController {
 
         return ResponseEntity.ok(form);
     }
+    
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<List<TriageForm>> getDoctorTriage(@PathVariable Long doctorId) {
+        List<TriageForm> list = triageService.getDoctorForms(doctorId);
+        return ResponseEntity.ok(list);
+    }
+    
+    @GetMapping("/{triageId}")
+    public ResponseEntity<?> getTriageDetail(@PathVariable Long triageId) {
+
+        TriageForm form = triageService.getById(triageId);
+
+        if (form == null) {
+            return ResponseEntity.status(404).body("해당 문진을 찾을 수 없습니다.");
+        }
+
+        return ResponseEntity.ok(form);
+    }
+
 }

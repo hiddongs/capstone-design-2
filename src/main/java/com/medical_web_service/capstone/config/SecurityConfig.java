@@ -46,17 +46,17 @@ public class SecurityConfig {
                 .httpBasic(h -> h.disable())
                 .formLogin(f -> f.disable());
 
-        // 🔥 JWT 필터 추가
+        // JWT 필터 추가
         http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                 UsernamePasswordAuthenticationFilter.class);
 
-        // 🔥 예외 처리
+        // 예외 처리
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
         );
 
-        // 🔥 URL 권한 설정 (Boot 3.x)
+        //  URL 권한 설정 (Boot 3.x)
         http.authorizeHttpRequests(auth -> auth
 
                 // AI 진단은 로그인 필요 없음
@@ -73,14 +73,19 @@ public class SecurityConfig {
                 // 로그인/회원가입
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // 그 외 "/api/**" 는 기본적으로 인증 필요
+                // 마이페이지 등 로그인 필요
                 .requestMatchers("/api/mypage/**").authenticated()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/doctor/**").hasAnyRole("ADMIN", "DOCTOR")
 
-                // 나머지는 전부 허용
+                // 의사 조회 허용
+                .requestMatchers("/api/doctor/**").permitAll()
+
+                // 예약 API 전체 허용 (필수)
+                .requestMatchers("/api/reservation/**").permitAll()
+
                 .anyRequest().permitAll()
         );
+
 
         return http.build();
     }

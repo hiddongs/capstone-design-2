@@ -15,4 +15,9 @@ public interface TriageRepository extends JpaRepository<TriageForm, Long> {
 
     // ⭐ 특정 진료과 문진 기록 조회 (선택)
     List<TriageForm> findByDepartment(String department);
+    
+ // ⭐ 특정 의사에게 배정된 문진 전체 조회
+    List<TriageForm> findByDoctorId(Long doctorId);
+    List<TriageForm> findByUserIdAndDoctorId(Long userId, Long doctorId);
+
 }

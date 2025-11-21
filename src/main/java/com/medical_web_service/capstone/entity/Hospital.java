@@ -18,6 +18,8 @@ public class Hospital {
     private String address;
     private String roadAddress;
     private String phone;
+    @Column(name = "operating_hours")
+    private String operatingHours;
 
     @Column(columnDefinition = "TEXT")
     private String department;

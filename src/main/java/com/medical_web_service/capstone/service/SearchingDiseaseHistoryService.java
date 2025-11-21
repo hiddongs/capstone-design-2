@@ -34,7 +34,7 @@ public class SearchingDiseaseHistoryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        return searchingDiseaseHistoryRepository.findByUser(user);
+        return searchingDiseaseHistoryRepository.findByUserId(userId);
     }
 
     // 사용자의 특정 검색 기록 삭제

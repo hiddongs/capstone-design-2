@@ -51,5 +51,12 @@ public class TriageService {
         return triageRepository.save(form);
     }
 
+    public List<TriageForm> getDoctorForms(Long doctorId) {
+        return triageRepository.findByDoctorId(doctorId);
+    }
+    public TriageForm getById(Long id) {
+        return triageRepository.findById(id).orElse(null);
+    }
+
 }
 

@@ -9,6 +9,7 @@ import com.medical_web_service.capstone.entity.User;
 
 public interface SearchingDiseaseHistoryRepository extends JpaRepository<SearchingDiseaseHistory, Long> {
 	
-	List<SearchingDiseaseHistory> findByUser(User user);
+	  List<SearchingDiseaseHistory> findByUserId(Long userId);
+	
 
 }

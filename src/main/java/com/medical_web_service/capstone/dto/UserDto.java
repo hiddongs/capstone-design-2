@@ -23,7 +23,8 @@ public class UserDto {
     private String gender;
     private String phone;
     private Role role;
-
+    private Integer career;
+    private String department;
     private List<DiseaseHistoryDto> diseaseHistories;
     private List<SearchingDiseaseHistoryDto> searchingDiseaseHistories;
 
@@ -35,6 +36,8 @@ public class UserDto {
         this.gender = user.getGender();
         this.phone = user.getPhone();
         this.role = user.getRole();
+        this.career = user.getCareer();
+        this.department = user.getDepartment();
 
         if (user.getDiseaseHistory() != null) {
             this.diseaseHistories = user.getDiseaseHistory()

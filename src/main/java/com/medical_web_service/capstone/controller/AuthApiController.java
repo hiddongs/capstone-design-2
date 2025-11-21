@@ -1,19 +1,35 @@
 package com.medical_web_service.capstone.controller;
 
+import java.util.Map;
+
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.medical_web_service.capstone.dto.AuthDto;
+import com.medical_web_service.capstone.dto.UserDto;
 import com.medical_web_service.capstone.entity.User;
 import com.medical_web_service.capstone.service.AuthService;
 import com.medical_web_service.capstone.service.UserDetailsImpl;
 import com.medical_web_service.capstone.service.UserService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
-
-import java.util.Map;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -41,14 +57,23 @@ public class AuthApiController {
     	}
     }
 
-    // 로그인 -> 토큰 발급
+ // 로그인 -> 토큰 발급
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthDto.LoginDto loginDto) {
-        // User 등록 및 Refresh Token 저장
+        // 인증 처리
         AuthDto.TokenDto tokenDto = authService.login(loginDto);
-        Long userid = userService.findIdByUsername(loginDto.getUsername());
 
-        // RT 저장
+        // 사용자 정보 가져오기
+        User user = userService.findUserByUsername(loginDto.getUsername());
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        Long userId = user.getId();
+        String role = user.getRole().getKey(); // ROLE_DOCTOR, ROLE_USER 등
+
+        // Refresh Token 저장
         HttpCookie httpCookie = ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
                 .maxAge(COOKIE_EXPIRATION)
                 .httpOnly(true)
@@ -57,11 +82,16 @@ public class AuthApiController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                // AT 저장
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken()).body(Map.of(
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
+                .body(Map.of(
                         "accessToken", tokenDto.getAccessToken(),
-                        "userId", userid));
+                        "userId", userId,
+                        "role", role,              // ⭐ 추가됨
+                        "username", user.getUsername(),
+                        "name", user.getName()
+                ));
     }
+
     @PutMapping("/update/{userId}")
     public ResponseEntity<String> updateUser(@PathVariable Long userId, @RequestBody AuthDto.UpdateDto updateDto) {
         try {
@@ -141,30 +171,31 @@ public class AuthApiController {
     }
 
     @GetMapping("/mypage/{userId}")
-    public ResponseEntity<?> loadMyPage(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        // 현재 로그인한 사용자의 ID 가져오기
+    public ResponseEntity<?> loadMyPage(@PathVariable("userId") Long userId, 
+                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        // 현재 로그인한 사용자 ID
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
         System.out.println("LoggedInUserId: " + loggedInUserId);
         System.out.println("RequestedUserId: " + userId);
 
-        // 요청한 사용자와 현재 로그인한 사용자의 ID가 일치하지 않는 경우 권한이 없는 것으로 처리
+        // 로그인한 사용자 = 요청한 사용자인지 검증
         if (!userId.equals(loggedInUserId)) {
             System.out.println("Unauthorized access attempt");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // userId를 이용하여 사용자 정보를 데이터베이스에서 조회합니다.
-        User user = userService.getUserById(userId);
+        // fetch join으로 diseaseHistory + searchingDiseaseHistories 모두 가져옴
+        User user = userService.getUserWithHistories(userId);
         System.out.println("User: " + user);
 
-        // 사용자 정보가 존재하지 않는 경우 404 에러를 반환합니다.
         if (user == null) {
-            System.out.println("User not found");
             return ResponseEntity.notFound().build();
         }
 
-        // 사용자 정보가 존재하는 경우 해당 정보를 반환합니다.
-        return ResponseEntity.ok(user);
+        // DTO 변환 — LazyInitializationException 없음
+        UserDto dto = new UserDto(user);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/user/{userId}/isDoctor")
