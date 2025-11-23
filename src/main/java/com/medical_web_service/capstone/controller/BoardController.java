@@ -1,19 +1,33 @@
 package com.medical_web_service.capstone.controller;
 
-import com.medical_web_service.capstone.dto.BoardDto;
-import com.medical_web_service.capstone.dto.BoardMapper;
-import com.medical_web_service.capstone.entity.Board;
-import com.medical_web_service.capstone.service.BoardService;
-import com.medical_web_service.capstone.service.UserDetailsImpl;
-import com.medical_web_service.capstone.service.UserService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.medical_web_service.capstone.dto.BoardDto;
+import com.medical_web_service.capstone.dto.BoardMapper;
+import com.medical_web_service.capstone.entity.Board;
+import com.medical_web_service.capstone.repository.BoardRepository;
+import com.medical_web_service.capstone.service.BoardService;
+import com.medical_web_service.capstone.service.UserDetailsImpl;
+import com.medical_web_service.capstone.service.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -21,6 +35,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class BoardController {
 
+
+    private final BoardRepository boardRepository;
     private final BoardService boardService;
     private final UserService userService;
 
@@ -83,5 +99,21 @@ public class BoardController {
 
         boardService.deleteBoard(boardId);
         return ResponseEntity.ok().build();
+    }
+    
+    // 전체 게시글 조회 + 검색
+    @GetMapping("/search")
+    public ResponseEntity<List<Board>> getBoards(
+            @RequestParam(value = "keyword", required = false) String keyword
+    ) {
+        List<Board> list;
+
+        if (keyword == null || keyword.isBlank()) {
+            list = boardRepository.findAll();
+        } else {
+            list = boardRepository.findByTitleContainingOrContentContaining(keyword, keyword);
+        }
+
+        return ResponseEntity.ok(list);
     }
 }

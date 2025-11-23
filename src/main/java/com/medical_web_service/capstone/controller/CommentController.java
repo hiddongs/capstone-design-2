@@ -1,18 +1,30 @@
 package com.medical_web_service.capstone.controller;
 
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.medical_web_service.capstone.dto.CommentDto;
+import com.medical_web_service.capstone.dto.CommentResponseDto;
 import com.medical_web_service.capstone.entity.Comment;
 import com.medical_web_service.capstone.service.CommentService;
 import com.medical_web_service.capstone.service.UserDetailsImpl;
 import com.medical_web_service.capstone.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
@@ -46,10 +58,10 @@ public class CommentController {
      * **/
 
     @GetMapping("/board/{boardId}")
-    public ResponseEntity<List<Comment>> readComments(@PathVariable Long boardId) {
-        List<Comment> comments = commentService.readComments(boardId);
-        return new ResponseEntity<>(comments, HttpStatus.OK);
+    public ResponseEntity<List<CommentResponseDto>> readComments(@PathVariable Long boardId) {
+        return ResponseEntity.ok(commentService.readComments(boardId));
     }
+
 
     /**
      * 수정기능

@@ -1,11 +1,13 @@
 package com.medical_web_service.capstone.service;
 
-import com.medical_web_service.capstone.entity.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.medical_web_service.capstone.entity.User;
 
 
 public class UserDetailsImpl implements UserDetails {
@@ -19,7 +21,7 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(() -> user.getRole().getKey()); // key: ROLE_권한
+        authorities.add(new SimpleGrantedAuthority(user.getRole().getKey())); 
         return authorities;
     }
 
@@ -55,7 +57,9 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() { // 계정의 활성화 여부
         return true;
     }
-
+    public User getUser() {
+        return this.user;
+    }
 
     public Long getId() {
         return user.getId();

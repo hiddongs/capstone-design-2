@@ -56,6 +56,10 @@ public class ReservationService {
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
     }
+    public Reservation getReservationById(Long id) {
+        return reservationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
+    }
 
     public List<Reservation> getUserReservations(Long userId) {
         return reservationRepository.findByUserId(userId);

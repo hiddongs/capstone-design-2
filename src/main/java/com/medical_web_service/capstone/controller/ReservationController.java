@@ -36,11 +36,16 @@ public class ReservationController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Reservation>> getUserReservations(@PathVariable("id") Long userId) {
+    public ResponseEntity<List<Reservation>> getUserReservations(@PathVariable("userId") Long userId) {
         List<Reservation> reservations = reservationService.getUserReservations(userId);
         return ResponseEntity.ok(reservations);
     }
-    
+
+    @GetMapping("/detail/{reservationId}")
+    public ResponseEntity<Reservation> getReservationDetail(@PathVariable Long reservationId) {
+        Reservation reservation = reservationService.getReservationById(reservationId);
+        return ResponseEntity.ok(reservation);
+    }
     @GetMapping("/list")
     public ResponseEntity<List<Reservation>> getBookings() {
         return ResponseEntity.ok(reservationService.getAllReservations());

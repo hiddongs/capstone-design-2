@@ -8,16 +8,18 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.medical_web_service.capstone.entity.Board;
 import com.medical_web_service.capstone.entity.DiseaseHistory;
 import com.medical_web_service.capstone.entity.Reservation;
 import com.medical_web_service.capstone.entity.Role;
 import com.medical_web_service.capstone.entity.SearchingDiseaseHistory;
 import com.medical_web_service.capstone.entity.TriageForm;
 import com.medical_web_service.capstone.entity.User;
+import com.medical_web_service.capstone.repository.BoardRepository;
+import com.medical_web_service.capstone.repository.CommentRepository;
 import com.medical_web_service.capstone.repository.DiseaseHistoryRepository;
 import com.medical_web_service.capstone.repository.ReservationRepository;
 import com.medical_web_service.capstone.repository.SearchingDiseaseHistoryRepository;
-
 import com.medical_web_service.capstone.repository.TriageRepository;
 import com.medical_web_service.capstone.repository.UserRepository;
 
@@ -28,12 +30,12 @@ import lombok.RequiredArgsConstructor;
 public class DoctorService {
     private final UserRepository userRepository;
     private final UserService userService;
-  
+    private final CommentRepository commentRepository;  
     private final TriageRepository triageRepository;
     private final DiseaseHistoryRepository diseaseHistoryRepository;
     private final SearchingDiseaseHistoryRepository searchingHistoryRepository;
     private final ReservationRepository reservationRepository;
-
+    private final BoardRepository boardRepository;
     public Map<String, Object> getUserDiseaseHistoryWithInfo(Long userId) {
         // 유저 정보 가져오기
         User user = userRepository.findById(userId)
@@ -94,6 +96,23 @@ public class DoctorService {
     
     public List<Reservation> getDoctorReservations(Long doctorId) {
         return reservationRepository.findByDoctorId(doctorId);
+    }
+    
+    public List<Board> getUnansweredBoards(Long doctorId) {
+
+        // ① 의사 정보 가져오기 → 진료과 확인
+        User doctor = userRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        String department = doctor.getDepartment();   // 내과, 외과 등
+
+        // ② 해당 진료과 게시글만 가져오기
+        List<Board> boards = boardRepository.findByDepartment(department);
+
+        // ③ 댓글이 없는 게시글만 필터링 = "미답변 게시글"
+        return boards.stream()
+                .filter(b -> commentRepository.findByBoard_Id(b.getId()).isEmpty())
+                .collect(Collectors.toList());
     }
 
 

@@ -2,7 +2,7 @@ package com.medical_web_service.capstone.entity;
 
 import java.util.Date;
 
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
@@ -23,6 +24,7 @@ import lombok.Setter;
 @Table(name = "doctor_application")
 @Getter 
 @Setter
+
 @NoArgsConstructor
 public class DoctorApplication {
 
@@ -31,18 +33,20 @@ public class DoctorApplication {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "user_id")
     private User user;
 
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
+    private String department;
 
     private String licenseNumber;
     private String hospitalName;
 
     private Date createdAt;
     private Date updatedAt;
-    private String imagePath;
+    
 
     @PrePersist
     protected void onCreate() {

@@ -2,7 +2,16 @@ package com.medical_web_service.capstone.service;
 
 
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.medical_web_service.capstone.dto.CommentDto;
+import com.medical_web_service.capstone.dto.CommentResponseDto;
 import com.medical_web_service.capstone.entity.Board;
 import com.medical_web_service.capstone.entity.Comment;
 import com.medical_web_service.capstone.entity.Role;
@@ -10,16 +19,9 @@ import com.medical_web_service.capstone.entity.User;
 import com.medical_web_service.capstone.repository.BoardRepository;
 import com.medical_web_service.capstone.repository.CommentRepository;
 import com.medical_web_service.capstone.repository.UserRepository;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -52,10 +54,21 @@ public class CommentService {
     }
 
     @Transactional
-    public List<Comment> readComments(Long boardId){
-        Board board = boardRepository.findById(boardId)
+    public List<CommentResponseDto> readComments(Long boardId) {
+        // 게시글 존재 여부 체크
+        boardRepository.findById(boardId)
                 .orElseThrow(() -> new EntityNotFoundException("Board not found with id: " + boardId));
-        return commentRepository.findByBoardId(boardId);
+
+        return commentRepository.findByBoard_Id(boardId)
+                .stream()
+                .map(c -> new CommentResponseDto(
+                        c.getId(),                 // 댓글 ID
+                        c.getUser().getId(),       // 의사 ID (user.id)
+                        c.getComment(),            // comment 내용
+                        c.getWriter(),             // writer
+                        c.getCreatedDate()         // createdTime
+                ))
+                .toList();
     }
 
     @Transactional
@@ -87,4 +100,5 @@ public class CommentService {
         }
         commentRepository.deleteById(commentId);
     }
+    
 }

@@ -35,4 +35,5 @@ public class AdminService {
         user.setRole(newRole);
         return userRepository.save(user);
     }
+    
 }

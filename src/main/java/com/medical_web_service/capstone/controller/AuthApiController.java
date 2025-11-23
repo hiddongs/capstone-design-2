@@ -202,4 +202,24 @@ public class AuthApiController {
     public boolean isDoctor(@PathVariable Long userId) {
         return userService.userIsDoctor(userId);
     }
+    
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        }
+
+        User user = userService.findUserById(userDetails.getUser().getId());
+
+
+        return ResponseEntity.ok(Map.of(
+        		 Map.entry("id", user.getId()),
+        	        Map.entry("username", user.getUsername()),
+        	        Map.entry("name", user.getName() == null ? "" : user.getName()),
+        	        Map.entry("role", user.getRole().getKey()),
+        	        Map.entry("department", user.getDepartment() == null ? "" : user.getDepartment()),
+        	        Map.entry("career", user.getCareer() == null ? "" : user.getCareer())
+        ));
+    }
 }

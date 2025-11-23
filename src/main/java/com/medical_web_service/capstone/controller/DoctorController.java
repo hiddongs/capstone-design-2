@@ -71,5 +71,10 @@ public class DoctorController {
     }
 
 
+    @GetMapping("/{doctorId}/unanswered-boards")
+    public ResponseEntity<?> getUnansweredBoards(@PathVariable Long doctorId) {
+        List<?> boards = doctorService.getUnansweredBoards(doctorId);
+        return ResponseEntity.ok(boards);
+    }
 
 }

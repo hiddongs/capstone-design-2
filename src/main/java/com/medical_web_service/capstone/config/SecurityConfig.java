@@ -76,6 +76,7 @@ public class SecurityConfig {
                 // 마이페이지 등 로그인 필요
                 .requestMatchers("/api/mypage/**").authenticated()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/doctor-apply/**").authenticated()
 
                 // 의사 조회 허용
                 .requestMatchers("/api/doctor/**").permitAll()
