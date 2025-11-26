@@ -46,34 +46,29 @@ public class AuthApiController {
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid AuthDto.SignupDto signupDto) {
-    	try {
-        String encodedPassword = encoder.encode(signupDto.getPassword()); // 비밀번호 암호화
-        AuthDto.SignupDto newSignupDto = AuthDto.SignupDto.encodePassword(signupDto, encodedPassword);
-
-        userService.registerUser(newSignupDto);
-        return new ResponseEntity<>(HttpStatus.OK);
-    	}catch(IllegalArgumentException e){
-    		return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-    	}
+        try {
+            String encodedPassword = encoder.encode(signupDto.getPassword());
+            AuthDto.SignupDto newSignupDto = AuthDto.SignupDto.encodePassword(signupDto, encodedPassword);
+            userService.registerUser(newSignupDto);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
- // 로그인 -> 토큰 발급
+    // 로그인 -> 토큰 발급
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthDto.LoginDto loginDto) {
-        // 인증 처리
         AuthDto.TokenDto tokenDto = authService.login(loginDto);
 
-        // 사용자 정보 가져오기
         User user = userService.findUserByUsername(loginDto.getUsername());
-
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
         }
 
         Long userId = user.getId();
-        String role = user.getRole().getKey(); // ROLE_DOCTOR, ROLE_USER 등
+        String role = user.getRole().getKey();
 
-        // Refresh Token 저장
         HttpCookie httpCookie = ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
                 .maxAge(COOKIE_EXPIRATION)
                 .httpOnly(true)
@@ -86,16 +81,20 @@ public class AuthApiController {
                 .body(Map.of(
                         "accessToken", tokenDto.getAccessToken(),
                         "userId", userId,
-                        "role", role,              // ⭐ 추가됨
+                        "role", role,
                         "username", user.getUsername(),
                         "name", user.getName()
                 ));
     }
 
+    // 사용자 정보 업데이트
     @PutMapping("/update/{userId}")
-    public ResponseEntity<String> updateUser(@PathVariable Long userId, @RequestBody AuthDto.UpdateDto updateDto) {
+    public ResponseEntity<String> updateUser(
+            @PathVariable(name = "userId") Long userId,
+            @RequestBody AuthDto.UpdateDto updateDto) {
+
         try {
-            String encodedPassword = encoder.encode(updateDto.getNewPassword()); // 새로운 비밀번호 암호화
+            String encodedPassword = encoder.encode(updateDto.getNewPassword());
             userService.updateUser(userId, updateDto, encodedPassword);
             return ResponseEntity.ok("사용자 정보가 성공적으로 업데이트되었습니다.");
         } catch (IllegalArgumentException e) {
@@ -103,8 +102,9 @@ public class AuthApiController {
         }
     }
 
+    // 사용자 삭제
     @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<String> deleteUser(@PathVariable(name = "userId") Long userId) {
         try {
             userService.deleteUser(userId);
             return ResponseEntity.ok("사용자가 성공적으로 삭제되었습니다.");
@@ -113,37 +113,37 @@ public class AuthApiController {
         }
     }
 
-
+    // Access Token 검증
     @PostMapping("/validate")
-    public ResponseEntity<?> validate(@RequestHeader("Authorization") String requestAccessToken) {
+    public ResponseEntity<?> validate(@RequestHeader(name = "Authorization") String requestAccessToken) {
         if (!authService.validate(requestAccessToken)) {
-            return ResponseEntity.status(HttpStatus.OK).build(); // 재발급 필요X
+            return ResponseEntity.status(HttpStatus.OK).build();
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 재발급 필요
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
-    // 토큰 재발급
+
+    // Refresh Token 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@CookieValue(name = "refresh-token") String requestRefreshToken,
-                                     @RequestHeader("Authorization") String requestAccessToken) {
+    public ResponseEntity<?> reissue(
+            @CookieValue(name = "refresh-token") String requestRefreshToken,
+            @RequestHeader(name = "Authorization") String requestAccessToken) {
+
         AuthDto.TokenDto reissuedTokenDto = authService.reissue(requestAccessToken, requestRefreshToken);
 
-        if (reissuedTokenDto != null) { // 토큰 재발급 성공
-            // RT 저장
+        if (reissuedTokenDto != null) {
             ResponseCookie responseCookie = ResponseCookie.from("refresh-token", reissuedTokenDto.getRefreshToken())
                     .maxAge(COOKIE_EXPIRATION)
                     .httpOnly(true)
                     .secure(true)
                     .build();
+
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                    // AT 저장
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + reissuedTokenDto.getAccessToken())
                     .build();
-
-        } else { // Refresh Token 탈취 가능성
-            // Cookie 삭제 후 재로그인 유도
+        } else {
             ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
                     .maxAge(0)
                     .path("/")
@@ -157,8 +157,9 @@ public class AuthApiController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken) {
+    public ResponseEntity<?> logout(@RequestHeader(name = "Authorization") String requestAccessToken) {
         authService.logout(requestAccessToken);
+
         ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
                 .maxAge(0)
                 .path("/")
@@ -170,39 +171,32 @@ public class AuthApiController {
                 .build();
     }
 
+    // 마이페이지 조회
     @GetMapping("/mypage/{userId}")
-    public ResponseEntity<?> loadMyPage(@PathVariable("userId") Long userId, 
-                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<?> loadMyPage(
+            @PathVariable(name = "userId") Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        // 현재 로그인한 사용자 ID
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
-        System.out.println("LoggedInUserId: " + loggedInUserId);
-        System.out.println("RequestedUserId: " + userId);
 
-        // 로그인한 사용자 = 요청한 사용자인지 검증
         if (!userId.equals(loggedInUserId)) {
-            System.out.println("Unauthorized access attempt");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // fetch join으로 diseaseHistory + searchingDiseaseHistories 모두 가져옴
         User user = userService.getUserWithHistories(userId);
-        System.out.println("User: " + user);
-
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
 
-        // DTO 변환 — LazyInitializationException 없음
         UserDto dto = new UserDto(user);
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/user/{userId}/isDoctor")
-    public boolean isDoctor(@PathVariable Long userId) {
+    public boolean isDoctor(@PathVariable(name = "userId") Long userId) {
         return userService.userIsDoctor(userId);
     }
-    
+
     @GetMapping("/me")
     public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
@@ -212,14 +206,13 @@ public class AuthApiController {
 
         User user = userService.findUserById(userDetails.getUser().getId());
 
-
         return ResponseEntity.ok(Map.of(
-        		 Map.entry("id", user.getId()),
-        	        Map.entry("username", user.getUsername()),
-        	        Map.entry("name", user.getName() == null ? "" : user.getName()),
-        	        Map.entry("role", user.getRole().getKey()),
-        	        Map.entry("department", user.getDepartment() == null ? "" : user.getDepartment()),
-        	        Map.entry("career", user.getCareer() == null ? "" : user.getCareer())
+                Map.entry("id", user.getId()),
+                Map.entry("username", user.getUsername()),
+                Map.entry("name", user.getName() == null ? "" : user.getName()),
+                Map.entry("role", user.getRole().getKey()),
+                Map.entry("department", user.getDepartment() == null ? "" : user.getDepartment()),
+                Map.entry("career", user.getCareer() == null ? "" : user.getCareer())
         ));
     }
 }

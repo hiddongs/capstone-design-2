@@ -35,35 +35,43 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BoardController {
 
-
     private final BoardRepository boardRepository;
     private final BoardService boardService;
     private final UserService userService;
 
+    // 전체 게시글 조회 (페이징)
     @GetMapping
     public ResponseEntity<Page<BoardDto.PostDetailsDTO>> getAllBoards(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+
         Pageable pageable = PageRequest.of(page, size);
         Page<Board> boards = boardService.readAllBoard(pageable);
         Page<BoardDto.PostDetailsDTO> boardDtos = boards.map(BoardMapper::toDto);
-        return ResponseEntity.ok().body(boardDtos);
+
+        return ResponseEntity.ok(boardDtos);
     }
 
+    //  게시글 단일 조회
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardDto.PostDetailsDTO> getBoardById(@PathVariable Long boardId) {
+    public ResponseEntity<BoardDto.PostDetailsDTO> getBoardById(
+            @PathVariable("boardId") Long boardId) {
+
         return boardService.getBoardById(boardId)
                 .map(BoardMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // 게시글 생성
     @PostMapping("/{userId}")
-    public ResponseEntity<Void> createBoard(@PathVariable Long userId, @RequestBody BoardDto.CreateBoardDto boardDto,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Void> createBoard(
+            @PathVariable("userId") Long userId,
+            @RequestBody BoardDto.CreateBoardDto boardDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
 
-        // 요청한 사용자와 현재 로그인한 사용자의 ID가 일치하지 않는 경우 권한이 없는 것으로 처리
         if (!userId.equals(loggedInUserId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -72,13 +80,16 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    // ✅ 게시글 수정
     @PutMapping("/{userId}/{boardId}")
-    public ResponseEntity<Void> updateBoard(@PathVariable Long userId, @PathVariable Long boardId,
-                                            @RequestBody BoardDto.UpdateBoardDto boardDto,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Void> updateBoard(
+            @PathVariable("userId") Long userId,
+            @PathVariable("boardId") Long boardId,
+            @RequestBody BoardDto.UpdateBoardDto boardDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
 
-        // 요청한 사용자와 현재 로그인한 사용자의 ID가 일치하지 않는 경우 권한이 없는 것으로 처리
         if (!userId.equals(loggedInUserId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -87,12 +98,15 @@ public class BoardController {
         return ResponseEntity.ok().build();
     }
 
+    //  게시글 삭제
     @DeleteMapping("/{userId}/{boardId}")
-    public ResponseEntity<Void> deleteBoard(@PathVariable Long userId, @PathVariable Long boardId,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Void> deleteBoard(
+            @PathVariable("userId") Long userId,
+            @PathVariable("boardId") Long boardId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
 
-        // 요청한 사용자와 현재 로그인한 사용자의 ID가 일치하지 않는 경우 권한이 없는 것으로 처리
         if (!userId.equals(loggedInUserId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -100,12 +114,12 @@ public class BoardController {
         boardService.deleteBoard(boardId);
         return ResponseEntity.ok().build();
     }
-    
-    // 전체 게시글 조회 + 검색
+
+    // 게시글 검색
     @GetMapping("/search")
     public ResponseEntity<List<Board>> getBoards(
-            @RequestParam(value = "keyword", required = false) String keyword
-    ) {
+            @RequestParam(name = "keyword", required = false) String keyword) {
+
         List<Board> list;
 
         if (keyword == null || keyword.isBlank()) {

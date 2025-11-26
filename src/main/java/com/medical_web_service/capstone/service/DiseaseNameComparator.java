@@ -15,7 +15,7 @@ public class DiseaseNameComparator implements Comparator<String> {
 
     @Override
     public int compare(String name1, String name2) {
-        // 1. 숫자 우선 정렬
+        // 숫자 우선 정렬
         if (isNumeric(name1) && isNumeric(name2)) {
             return Integer.compare(Integer.parseInt(name1), Integer.parseInt(name2));
         } else if (isNumeric(name1)) {
@@ -24,7 +24,7 @@ public class DiseaseNameComparator implements Comparator<String> {
             return 1;   // name2가 숫자면 name1 뒤로 옴
         }
 
-        // 2. 영어 우선 정렬
+        // 영어 우선 정렬
         if (isAlphabet(name1) && isAlphabet(name2)) {
             return name1.compareToIgnoreCase(name2);
         } else if (isAlphabet(name1)) {
@@ -33,7 +33,7 @@ public class DiseaseNameComparator implements Comparator<String> {
             return 1;   // name2가 영어면 name1 뒤로 옴
         }
 
-        // 3. 한글 자모 순서 정렬
+        // 한글 자모 순서 정렬
         return koreanCollator.compare(name1, name2);
     }
 

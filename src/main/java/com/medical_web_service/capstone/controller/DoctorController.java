@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.medical_web_service.capstone.entity.Reservation;
 import com.medical_web_service.capstone.entity.User;
@@ -24,57 +21,62 @@ public class DoctorController {
 
     private final DoctorService doctorService;
     private final ReservationService reservationService;
-    
     private final ReservationRepository reservationRepository;
-    @GetMapping("/get/{userId}/disease-history")
-    public ResponseEntity<Map<String, Object>> getUserDiseaseHistory(@PathVariable Long userId) {
-        // Service 로직 대신 Repository를 사용하여 데이터를 직접 가져옴
 
+    @GetMapping("/get/{userId}/disease-history")
+    public ResponseEntity<Map<String, Object>> getUserDiseaseHistory(
+            @PathVariable(name = "userId") Long userId
+    ) {
         Map<String, Object> userDisease = doctorService.getUserDiseaseHistoryWithInfo(userId);
-        // HTTP 응답 반환
         return ResponseEntity.ok(userDisease);
     }
-    
-    
+
     @GetMapping("/list/{department}")
-    public ResponseEntity<List<User>> getDoctors(@PathVariable String department) {
+    public ResponseEntity<List<User>> getDoctors(
+            @PathVariable(name = "department") String department
+    ) {
         List<User> doctors = doctorService.getDoctorsByDepartment(department);
         return ResponseEntity.ok(doctors);
     }
-   
+
     @GetMapping("/by-dept/{department}")
-    public ResponseEntity<List<User>> getDoctorsByDept(@PathVariable("department") String department) {
+    public ResponseEntity<List<User>> getDoctorsByDept(
+            @PathVariable(name = "department") String department
+    ) {
         System.out.println("요청받은 department = " + department);
         List<User> doctors = doctorService.getDoctorsByDepartment(department);
         return ResponseEntity.ok(doctors);
     }
 
     @GetMapping("/{doctorId}")
-    public ResponseEntity<User> getDoctor(@PathVariable Long doctorId) {
+    public ResponseEntity<User> getDoctor(
+            @PathVariable(name = "doctorId") Long doctorId
+    ) {
         User doctor = doctorService.getDoctorById(doctorId);
         return ResponseEntity.ok(doctor);
     }
 
     @GetMapping("/{doctorId}/patient/{userId}")
     public ResponseEntity<?> getPatientDetail(
-            @PathVariable Long doctorId,
-            @PathVariable Long userId
+            @PathVariable(name = "doctorId") Long doctorId,
+            @PathVariable(name = "userId") Long userId
     ) {
         Map<String, Object> result = doctorService.getPatientDetail(doctorId, userId);
         return ResponseEntity.ok(result);
     }
 
-
     @GetMapping("/{doctorId}/reservations")
-    public ResponseEntity<List<Reservation>> getDoctorReservations(@PathVariable Long doctorId) {
+    public ResponseEntity<List<Reservation>> getDoctorReservations(
+            @PathVariable(name = "doctorId") Long doctorId
+    ) {
         return ResponseEntity.ok(doctorService.getDoctorReservations(doctorId));
     }
 
-
     @GetMapping("/{doctorId}/unanswered-boards")
-    public ResponseEntity<?> getUnansweredBoards(@PathVariable Long doctorId) {
+    public ResponseEntity<?> getUnansweredBoards(
+            @PathVariable(name = "doctorId") Long doctorId
+    ) {
         List<?> boards = doctorService.getUnansweredBoards(doctorId);
         return ResponseEntity.ok(boards);
     }
-
 }

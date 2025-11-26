@@ -28,7 +28,7 @@ public class Hospital {
 
     private String type;               // 기존 의료기관종별명
     private String medicalType;        // 확장된 의료기관종별명
-    @Column(length = 50)
+    @Column(columnDefinition = "TEXT")
     private String statusDetail;  // 상세영업상태명
 
     private Integer doctorCount;       // 의료인수

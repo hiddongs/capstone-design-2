@@ -23,22 +23,27 @@ public class HospitalController {
     private final HospitalRepository hospitalRepository;
 
     @GetMapping("/search")
-    public List<Hospital> searchByKeyword(@RequestParam String query) {
+    public List<Hospital> searchByKeyword(
+            @RequestParam(name = "query") String query
+    ) {
         return hospitalService.searchByKeyword(query);
     }
 
     @GetMapping("/department")
-    public List<Hospital> searchByDepartment(@RequestParam("dept") String dept) {
+    public List<Hospital> searchByDepartment(
+            @RequestParam(name = "dept") String dept
+    ) {
         return hospitalService.searchByDepartment(dept);
     }
+
     @GetMapping("/nearby")
     public List<Map<String, String>> getNearbyHospitals(
-            @RequestParam double lat,
-            @RequestParam double lng
+            @RequestParam(name = "lat") double lat,
+            @RequestParam(name = "lng") double lng
     ) {
         return hospitalService.searchNearby(lat, lng);
     }
-    
+
     @GetMapping("/all")
     public List<Hospital> getAllHospitals() {
         return hospitalService.getAllHospitals();
@@ -46,16 +51,16 @@ public class HospitalController {
 
     @GetMapping("/viewport")
     public List<Hospital> getHospitalsInViewport(
-            @RequestParam double minLat,
-            @RequestParam double maxLat,
-            @RequestParam double minLng,
-            @RequestParam double maxLng
+            @RequestParam(name = "minLat") double minLat,
+            @RequestParam(name = "maxLat") double maxLat,
+            @RequestParam(name = "minLng") double minLng,
+            @RequestParam(name = "maxLng") double maxLng
     ) {
         return hospitalRepository.findByYBetweenAndXBetween(minLat, maxLat, minLng, maxLng);
     }
+
     @GetMapping("/active")
     public List<Hospital> getActiveHospitals() {
         return hospitalRepository.findByStatusAndStatusDetailContaining("영업/정상", "정상");
     }
-
 }

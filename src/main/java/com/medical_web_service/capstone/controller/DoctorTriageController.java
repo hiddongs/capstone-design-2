@@ -20,9 +20,9 @@ public class DoctorTriageController {
     // ⭐ 의사별 문진 조회 API
     @GetMapping("/{doctorId}/triage")
     public ResponseEntity<List<TriageForm>> getDoctorTriageList(
-            @PathVariable Long doctorId
+            @PathVariable(name = "doctorId") Long doctorId
     ) {
-        List<TriageForm> list = triageService.getDoctorForms(doctorId);
+        List<TriageForm> list = triageService.getUserForms(doctorId);
         return ResponseEntity.ok(list);
     }
 }

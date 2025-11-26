@@ -23,29 +23,43 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    // ✔ 의사별 예약 가능한 시간 조회 API
+    // ✔ 의사별 예약 가능한 시간 조회
     @GetMapping("/slots/doctor/{doctorId}")
-    public ResponseEntity<List<String>> getAvailableSlots(@PathVariable("doctorId") Long doctorId) {
+    public ResponseEntity<List<String>> getAvailableSlots(
+            @PathVariable(name = "doctorId") Long doctorId
+    ) {
         List<String> slots = reservationService.getSlotsByDoctor(doctorId);
         return ResponseEntity.ok(slots);
     }
+
+    // ✔ 예약 생성
     @PostMapping("/create")
-    public ResponseEntity<?> createReservation(@RequestBody ReservationDto dto) {
+    public ResponseEntity<?> createReservation(
+            @RequestBody ReservationDto dto
+    ) {
         Long reservationId = reservationService.createReservation(dto);
         return ResponseEntity.ok(reservationId);
     }
 
+    // ✔ 사용자 예약 목록 조회
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Reservation>> getUserReservations(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<Reservation>> getUserReservations(
+            @PathVariable(name = "userId") Long userId
+    ) {
         List<Reservation> reservations = reservationService.getUserReservations(userId);
         return ResponseEntity.ok(reservations);
     }
 
+    // ✔ 예약 상세 조회
     @GetMapping("/detail/{reservationId}")
-    public ResponseEntity<Reservation> getReservationDetail(@PathVariable Long reservationId) {
+    public ResponseEntity<Reservation> getReservationDetail(
+            @PathVariable(name = "reservationId") Long reservationId
+    ) {
         Reservation reservation = reservationService.getReservationById(reservationId);
         return ResponseEntity.ok(reservation);
     }
+
+    // ✔ 전체 예약 조회
     @GetMapping("/list")
     public ResponseEntity<List<Reservation>> getBookings() {
         return ResponseEntity.ok(reservationService.getAllReservations());

@@ -18,6 +18,6 @@ public class TriageRequestDto {
     @Setter
     public static class QAItem {
         private String question;
-        private String answer;
+        private Object answer;
     }
 }

@@ -17,8 +17,9 @@ public class DiagnosisController {
     private final DiagnosisService diagnosisService;
 
     @PostMapping("/complete")
-    public Map<String, Object> analyze(@RequestParam Long userId,
-                                       @RequestParam String symptom) {
+    public Map<String, Object> analyze(@RequestParam(name = "userId") Long userId,
+                                       @RequestParam(name = "symptom") String symptom) {
         return diagnosisService.analyzeSymptom(userId, symptom);
     }
+
 }

@@ -3,15 +3,7 @@ package com.medical_web_service.capstone.controller;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.web.bind.annotation.*;
 import com.medical_web_service.capstone.entity.DoctorApplication;
 import com.medical_web_service.capstone.service.DoctorApplicationService;
 
@@ -24,12 +16,12 @@ public class DoctorApplicationController {
 
     private final DoctorApplicationService doctorApplicationService;
 
-    @PostMapping(value = "/apply")
+    @PostMapping("/apply")
     public ResponseEntity<?> apply(
-            @RequestParam("userId") Long userId,
-            @RequestParam("licenseNumber") String licenseNumber,
-            @RequestParam("hospitalName") String hospitalName,
-            @RequestParam("department") String department
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "licenseNumber") String licenseNumber,
+            @RequestParam(name = "hospitalName") String hospitalName,
+            @RequestParam(name = "department") String department
     ) {
         DoctorApplication app = doctorApplicationService.apply(
                 userId, licenseNumber, hospitalName, department
@@ -41,12 +33,11 @@ public class DoctorApplicationController {
         ));
     }
 
-
-
     // 신청 상태 조회
     @GetMapping("/status/{userId}")
-    public ResponseEntity<?> getStatus(@PathVariable Long userId) {
-
+    public ResponseEntity<?> getStatus(
+            @PathVariable(name = "userId") Long userId
+    ) {
         DoctorApplication app = doctorApplicationService.getStatus(userId);
 
         return ResponseEntity.ok(Map.of(
@@ -55,17 +46,21 @@ public class DoctorApplicationController {
                 "hospitalName", app.getHospitalName()
         ));
     }
-    
- // 관리자 승인
+
+    // 관리자 승인
     @PostMapping("/approve/{appId}")
-    public ResponseEntity<?> approve(@PathVariable Long appId) {
+    public ResponseEntity<?> approve(
+            @PathVariable(name = "appId") Long appId
+    ) {
         doctorApplicationService.approve(appId);
         return ResponseEntity.ok(Map.of("message", "승인 완료"));
     }
 
     // 관리자 거절
     @PostMapping("/reject/{appId}")
-    public ResponseEntity<?> reject(@PathVariable Long appId) {
+    public ResponseEntity<?> reject(
+            @PathVariable(name = "appId") Long appId
+    ) {
         doctorApplicationService.reject(appId);
         return ResponseEntity.ok(Map.of("message", "거절 완료"));
     }
@@ -75,6 +70,4 @@ public class DoctorApplicationController {
     public ResponseEntity<?> list() {
         return ResponseEntity.ok(doctorApplicationService.getAllApplicationsDto());
     }
-
-
 }

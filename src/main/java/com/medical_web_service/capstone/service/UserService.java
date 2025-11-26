@@ -91,17 +91,17 @@ public class UserService {
     }
     @Transactional
     public User getUserById(Long userId) {
-        // UserRepository를 사용하여 userId에 해당하는 사용자 정보를 데이터베이스에서 조회합니다.
+        // UserRepository를 사용하여 userId에 해당하는 사용자 정보를 데이터베이스에서 조회
         return userRepository.findById(userId).orElse(null);
     }
     public Long getLoggedInUserId(UserDetailsImpl userDetails) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated() && userDetails != null) {
-            // 현재 로그인한 사용자의 UserDetails 객체와 매개변수로 전달된 UserDetails 객체를 비교하여 일치하는 경우 사용자 ID를 반환합니다.
+            // 현재 로그인한 사용자의 UserDetails 객체와 매개변수로 전달된 UserDetails 객체를 비교하여 일치하는 경우 사용자 ID를 반환
             if (authentication.getPrincipal().equals(userDetails)) {
-                // 여기서는 UserDetails에 사용자 ID가 포함되어 있다고 가정합니다.
-                // 만약 UserDetails에 사용자 ID가 포함되어 있지 않다면 사용자의 정보를 저장하는 다른 방법을 사용해야 합니다.
+                // 여기서는 UserDetails에 사용자 ID가 포함되어 있다고 가정
+                // 만약 UserDetails에 사용자 ID가 포함되어 있지 않다면 사용자의 정보를 저장하는 다른 방법을 사용
                 return userDetails.getId();
             }
         }

@@ -31,7 +31,7 @@ public class TriageAIService {
         문진 내용:
         """ + buildQAString(dto);
 
-        // 📌 ChatCompletionDto 구성 (네 프로젝트 방식)
+        
         ChatCompletionDto chatDto = new ChatCompletionDto();
         chatDto.setModel("gpt-3.5-turbo");
 
@@ -56,11 +56,22 @@ public class TriageAIService {
         dto.getAnswers().forEach(a ->
             sb.append(a.getQuestion())
               .append(": ")
-              .append(a.getAnswer())
+              .append(normalizeAnswer(a.getAnswer()))
               .append("\n")
         );
         return sb.toString();
     }
+    private String normalizeAnswer(Object ansObj) {
+        if (ansObj == null) return "";
+
+        if (ansObj instanceof List) {
+            return String.join(", ",
+                ((List<?>) ansObj).stream().map(String::valueOf).toList()
+            );
+        }
+        return ansObj.toString();
+    }
+
 
     private String extractMessage(Map<String, Object> response) {
         try {

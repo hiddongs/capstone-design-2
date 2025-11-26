@@ -21,8 +21,13 @@ public class TriageForm {
     private String department;
 
     private String departmentName;
+    @Column(nullable = true)
+    private Double severityScore;
 
-    // ⭐ JSON 저장을 위한 TEXT or JSON 타입
+    @Column(length = 20, nullable = true)
+    private String severityLevel;
+
+    // JSON 저장을 위한 TEXT or JSON 타입
     @Column(columnDefinition = "TEXT")
     private String detailJson;
 

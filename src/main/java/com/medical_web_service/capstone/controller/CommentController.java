@@ -1,6 +1,5 @@
 package com.medical_web_service.capstone.controller;
 
-
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -35,16 +34,16 @@ public class CommentController {
     private final CommentService commentService;
     private final UserService userService;
 
-    /**
-     * 생성 기능
-     * **/
-
+    /** 생성 기능 **/
     @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestParam Long userId, @RequestParam Long boardId,
-                                                 @RequestBody CommentDto.CreateCommentDto createCommentDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Comment> createComment(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "boardId") Long boardId,
+            @RequestBody CommentDto.CreateCommentDto createCommentDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
 
-        // 요청한 사용자와 현재 로그인한 사용자의 ID가 일치하지 않는 경우 권한이 없는 것으로 처리
         if (!userId.equals(loggedInUserId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -53,26 +52,26 @@ public class CommentController {
         return new ResponseEntity<>(createdComment, HttpStatus.CREATED);
     }
 
-    /**
-     * 불러오는 기능
-     * **/
-
+    /** 댓글 불러오기 **/
     @GetMapping("/board/{boardId}")
-    public ResponseEntity<List<CommentResponseDto>> readComments(@PathVariable Long boardId) {
+    public ResponseEntity<List<CommentResponseDto>> readComments(
+            @PathVariable(name = "boardId") Long boardId
+    ) {
         return ResponseEntity.ok(commentService.readComments(boardId));
     }
 
-
-    /**
-     * 수정기능
-     * **/
+    /** 수정 기능 **/
     @PutMapping("/{commentId}")
-    public ResponseEntity<Comment> updateComment(@RequestParam Long userId, @RequestParam Long boardId, @PathVariable Long commentId
-            , @RequestBody CommentDto.UpdateCommentDto updateCommentDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Comment> updateComment(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "boardId") Long boardId,
+            @PathVariable(name = "commentId") Long commentId,
+            @RequestBody CommentDto.UpdateCommentDto updateCommentDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
 
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
 
-        // 요청한 사용자와 현재 로그인한 사용자의 ID가 일치하지 않는 경우 권한이 없는 것으로 처리
         if (!userId.equals(loggedInUserId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -81,22 +80,20 @@ public class CommentController {
         return new ResponseEntity<>(updatedComment, HttpStatus.OK);
     }
 
-    /**
-     * 삭제 기능
-     * **/
-
+    /** 삭제 기능 **/
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, @RequestParam Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable(name = "commentId") Long commentId,
+            @RequestParam(name = "userId") Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
         Long loggedInUserId = userService.getLoggedInUserId(userDetails);
 
-        // 요청한 사용자와 현재 로그인한 사용자의 ID가 일치하지 않는 경우 권한이 없는 것으로 처리
         if (!userId.equals(loggedInUserId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
 
         commentService.deleteComment(commentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
-

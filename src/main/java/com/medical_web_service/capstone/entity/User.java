@@ -1,18 +1,28 @@
 package com.medical_web_service.capstone.entity;
 
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.medical_web_service.capstone.dto.AuthDto;
-import jakarta.persistence.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -42,7 +52,8 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
+    @Column(nullable = true)
+    private Integer age;
     // 게시판 목록
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore

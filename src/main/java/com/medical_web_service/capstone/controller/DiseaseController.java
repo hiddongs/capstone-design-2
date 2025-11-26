@@ -21,7 +21,9 @@ public class DiseaseController {
 
     // 특정 질병의 정보를 반환하는 엔드포인트
     @GetMapping("/{diseaseName}")
-    public ResponseEntity<DiseaseInfo> getDiseaseInfo(@PathVariable String diseaseName) {
+    public ResponseEntity<DiseaseInfo> getDiseaseInfo(
+            @PathVariable(name = "diseaseName") String diseaseName
+    ) {
         DiseaseInfo diseaseInfo = diseaseService.getDiseaseInfo(diseaseName);
         if (diseaseInfo == null) {
             return ResponseEntity.notFound().build();
@@ -36,7 +38,7 @@ public class DiseaseController {
         return ResponseEntity.ok("Symptoms data loaded successfully.");
     }
 
-    // 전체 질병 리스트를 반환하는 엔드포인트 (추가)
+    // 전체 질병 리스트를 반환하는 엔드포인트
     @GetMapping
     public ResponseEntity<List<DiseaseInfo>> getAllDiseases() {
         List<DiseaseInfo> allDiseases = diseaseService.getAllDiseases();

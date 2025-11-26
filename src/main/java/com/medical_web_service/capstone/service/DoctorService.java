@@ -68,26 +68,26 @@ public class DoctorService {
 
         Map<String, Object> result = new HashMap<>();
 
-        // 1. 사용자 정보
+        // 사용자 정보
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보 없음: " + userId));
         result.put("user", user);
 
-        // 2. 🔥 특정 의사에게 배정된 triage만 조회
+        // 특정 의사에게 배정된 triage만 조회
         List<TriageForm> triageList =
                 triageRepository.findByUserIdAndDoctorId(userId, doctorId);
         result.put("triageList", triageList);
 
-        // 3. 질병 이력
+        // 질병 이력
         List<DiseaseHistory> diseaseList = diseaseHistoryRepository.findByUserId(userId);
         result.put("diseaseHistory", diseaseList);
 
-        // 4. 검색 이력
+        // 검색 이력
         List<SearchingDiseaseHistory> searchHistory =
                 searchingHistoryRepository.findByUserId(userId);
         result.put("searchHistory", searchHistory);
 
-        // 5. 예약 이력
+        // 예약 이력
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
         result.put("reservations", reservations);
 

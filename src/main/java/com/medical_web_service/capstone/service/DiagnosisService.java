@@ -26,11 +26,11 @@ public class DiagnosisService {
 
     public Map<String, Object> analyzeSymptom(Long userId, String symptom) {
 
-        // 1) 사용자 조회
+        // 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 2) GPT 프롬프트 구성
+        // GPT 프롬프트 구성
         ChatCompletionDto dto = new ChatCompletionDto();
         dto.setModel("gpt-4o-mini");
 
